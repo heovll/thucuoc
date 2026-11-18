@@ -29,7 +29,17 @@ Mở http://localhost:3000/admin/ – mật khẩu `admin` lần đầu nằm tr
 
 > Gói có ổ đĩa (disk) để giữ dữ liệu là gói trả phí của Render. Gói miễn phí **xoá sạch dữ liệu** mỗi lần khởi động lại – không dùng cho thật.
 
-### Cách 2 – VPS / Docker
+### Cách 2 – Hostinger (Node.js web app)
+1. Repo GitHub phải có đủ: `server.js`, `package.json`, `package-lock.json` **và các thư mục `src/`, `public/`, `scripts/`**.
+2. Phiên bản Node.js: chọn **22** hoặc **24**. Entry file: `server.js`.
+3. Biến môi trường:
+   - `DATA_DIR` = `/home/<tài-khoản>/domains/<tên-miền>/nhaccuoc-data` (ngoài thư mục `hbuilds`, vì thư mục đó bị thay mới mỗi lần triển khai)
+   - `TRUST_PROXY` = `1`, `ADMIN_PASSWORD`, `VAPID_SUBJECT`
+   - **Không** đặt `PORT` – Hostinger tự cấp.
+4. Bật SSL miễn phí cho tên miền (hPanel → Bảo mật → SSL) – thông báo điện thoại cần HTTPS.
+5. Kiểm tra: mở `https://<tên-miền>/api/health` → thấy `"ok":true` là app đang chạy.
+
+### Cách 3 – VPS / Docker
 ```bash
 docker build -t nhac-thu-cuoc .
 docker run -d --restart=always -p 3000:3000 -v /srv/nhac-cuoc-data:/data \

@@ -1,4 +1,22 @@
 // Máy chủ: API + trang quản trị (/admin) + app điện thoại cho khách hàng & CTV (/app).
+
+// Kiểm tra phiên bản Node trước tiên: app dùng SQLite có sẵn (node:sqlite) – cần Node 22.13+.
+// Hosting chọn Node cũ (18/20) sẽ báo lỗi rõ ràng trong log thay vì tắt im lặng (→ 503).
+{
+  const [maj, min] = process.versions.node.split('.').map(Number);
+  let ok = maj > 22 || (maj === 22 && min >= 13);
+  if (ok) {
+    try { require('node:sqlite'); } catch { ok = false; }
+  }
+  if (!ok) {
+    console.error(
+      `\n[LỖI] App cần Node.js 22.13 trở lên (đang chạy ${process.versions.node}).\n` +
+      '      → Vào cài đặt hosting, chọn phiên bản Node.js 22 hoặc 24, rồi khởi động lại app.\n'
+    );
+    process.exit(1);
+  }
+}
+
 const path = require('node:path');
 const express = require('express');
 const ExcelJS = require('exceljs');
@@ -19,6 +37,21 @@ app.use((req, res, next) => {
   res.set('Referrer-Policy', 'same-origin');
   res.set('X-Frame-Options', 'DENY');
   next();
+});
+
+// Dữ liệu API là riêng tư theo từng người đăng nhập → cấm CDN / trình duyệt lưu tạm
+// (CDN của hosting như Hostinger có thể đem trả nhầm dữ liệu khách này cho khách khác).
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, private');
+  res.set('CDN-Cache-Control', 'no-store');
+  res.set('Vary', 'Authorization');
+  next();
+});
+
+// Kiểm tra app có đang chạy: mở https://ten-mien/api/health
+const STARTED_AT = new Date().toISOString();
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, node: process.versions.node, startedAt: STARTED_AT, time: new Date().toISOString() });
 });
 
 auth.ensureAdmin();
