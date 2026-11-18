@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#1f6feb"/>
+  <path d="M256 104c-62 0-108 48-108 112v58c0 26-10 50-28 68l-14 14c-10 10-3 28 12 28h276c15 0 22-18 12-28l-14-14c-18-18-28-42-28-68v-58c0-64-46-112-108-112z" fill="#fff"/>
+  <path d="M212 404a44 44 0 0 0 88 0z" fill="#fff"/>
+  <circle cx="356" cy="140" r="46" fill="#ffb020" stroke="#1f6feb" stroke-width="14"/>
+  <text x="256" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="120" fill="#1f6feb">₫</text>
+</svg>

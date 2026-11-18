@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Nhắc cước</title>
+  <meta name="theme-color" content="#1f6feb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Nhắc cước">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="/shared/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="/shared/base.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <!-- Đăng nhập -->
+  <section id="vLogin" class="login-wrap hidden">
+    <div class="login-box">
+      <div style="text-align:center">
+        <img src="/shared/icon.svg" alt="" class="logo">
+        <h1>Nhắc cước</h1>
+      </div>
+      <div class="seg" role="tablist">
+        <button type="button" role="tab" data-tab="kh" class="on">Khách hàng</button>
+        <button type="button" role="tab" data-tab="ctv">Cộng tác viên</button>
+      </div>
+      <form id="fKh" class="card">
+        <div class="field"><label for="khTb">Nhập acc hoặc số điện thoại</label>
+          <input id="khTb" name="tra_cuu" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required placeholder="VD: q055_gftth_abc hoặc 0912345678"></div>
+        <div class="alert error hidden" data-err></div>
+        <button class="btn-primary w100">Vào xem cước</button>
+        <p class="small muted" style="margin:10px 0 0">Acc là tài khoản Internet/Truyền hình (vd q055_gftth_…) hoặc số thuê bao di động. Không nhớ? Hỏi CTV phụ trách.</p>
+      </form>
+      <form id="fCtv" class="card hidden">
+        <div class="field"><label for="ctvU">Mã CTV</label><input id="ctvU" name="username" autocomplete="username" autocapitalize="characters" required placeholder="VD: DUOCNT_QNI_CNKD"></div>
+        <div class="field"><label for="ctvP">Mật khẩu</label><input id="ctvP" name="password" type="password" autocomplete="current-password" required></div>
+        <div class="alert error hidden" data-err></div>
+        <button class="btn-primary w100">Đăng nhập</button>
+        <p class="center small" style="margin:12px 0 0">Chưa có tài khoản? <a href="#" id="toReg">Đăng ký CTV</a></p>
+      </form>
+      <form id="fReg" class="card hidden">
+        <h2 style="margin-bottom:4px">Đăng ký cộng tác viên</h2>
+        <p class="small muted" style="margin-top:0">Sau khi gửi, quản trị viên sẽ duyệt rồi bạn mới đăng nhập được.</p>
+        <div class="field"><label for="rgCode">Mã CTV *</label><input id="rgCode" name="staff_code" autocapitalize="characters" autocomplete="username" required placeholder="VD: DUOCNT_QNI_CNKD" pattern="[A-Za-z0-9._\-]{3,40}"></div>
+        <div class="field"><label for="rgName">Họ và tên *</label><input id="rgName" name="full_name" autocomplete="name" required></div>
+        <div class="field"><label for="rgPhone">Số điện thoại *</label><input id="rgPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required></div>
+        <div class="field"><label for="rgPw">Mật khẩu * (ít nhất 6 ký tự)</label><input id="rgPw" name="password" type="password" autocomplete="new-password" minlength="6" required></div>
+        <div class="field"><label for="rgPw2">Nhập lại mật khẩu *</label><input id="rgPw2" name="password2" type="password" autocomplete="new-password" minlength="6" required></div>
+        <div class="alert error hidden" data-err></div>
+        <button class="btn-primary w100">Gửi đăng ký</button>
+        <p class="center small" style="margin:12px 0 0"><a href="#" id="toLogin">← Quay lại đăng nhập</a></p>
+      </form>
+      <div id="regDone" class="card hidden center">
+        <div style="font-size:2.2rem">✅</div>
+        <h2>Đã gửi đăng ký</h2>
+        <p class="muted">Quản trị viên sẽ duyệt tài khoản <b id="regDoneCode"></b>. Sau khi được duyệt, hãy đăng nhập bằng Mã CTV và mật khẩu vừa tạo.</p>
+        <button type="button" id="regDoneBtn" class="btn-primary w100">Về trang đăng nhập</button>
+      </div>
+      <button type="button" id="btnInstall" class="w100 hidden" style="margin-top:12px">Cài app vào điện thoại</button>
+    </div>
+  </section>
+
+  <!-- Khách hàng -->
+  <section id="vKh" class="hidden">
+    <header class="top"><div><div class="top-title">Cước của tôi</div><div class="small top-sub" id="khPeriod"></div></div><button class="btn-sm ghost" data-logout>Thoát</button></header>
+    <main class="wrap">
+      <div id="khBills"></div>
+      <section id="khMsg" class="card hidden" style="margin-bottom:14px">
+        <h3 style="margin:0 0 8px">🔔 Thông báo</h3>
+        <p id="khMsgBody" class="msg-body"></p>
+        <a id="khSupport" class="btn btn-zalo w100 hidden" target="_blank" rel="noopener">💬 <span></span></a>
+        <div id="khNext" class="small muted" style="margin-top:10px"></div>
+      </section>
+      <div id="khNotify"></div>
+    </main>
+  </section>
+
+  <!-- CTV -->
+  <section id="vCtv" class="hidden">
+    <header class="top"><div style="min-width:0"><div class="top-title" id="ctvName">CTV</div><div class="small top-sub" id="ctvPeriod"></div></div>
+      <div style="display:flex;gap:6px"><button class="btn-sm ghost" id="toSet">⚙️ Thông báo</button><button class="btn-sm ghost" data-logout>Thoát</button></div></header>
+    <main class="wrap">
+      <div id="ctvNotify"></div>
+      <div class="sum" id="ctvSum"></div>
+      <div class="tabs" id="ctvTabs">
+        <button data-f="chua_thu" class="on">Chưa thu</button>
+        <button data-f="thieu">Thiếu tên/SĐT</button>
+        <button data-f="da_thu">Đã thu</button>
+        <button data-f="all">Tất cả</button>
+      </div>
+      <div class="filters">
+        <input id="ctvQ" type="search" placeholder="Tìm tên, Số TB, SĐT…">
+        <select id="ctvArea"><option value="">Mọi địa bàn</option></select>
+      </div>
+      <div id="ctvList"></div>
+      <button id="ctvMore" class="w100 hidden">Xem thêm</button>
+    </main>
+  </section>
+
+  <!-- CTV: cài đặt thông báo cho khách của mình -->
+  <section id="vCtvSet" class="hidden">
+    <header class="top"><div><div class="top-title">Cài đặt thông báo</div><div class="small top-sub">Áp dụng cho tất cả khách của bạn</div></div>
+      <button class="btn-sm ghost" id="backList">← Danh sách</button></header>
+    <main class="wrap">
+      <div class="card" style="margin-bottom:14px">
+        <h3 style="margin-top:0">1. Nội dung thông báo</h3>
+        <textarea id="stTpl" rows="5" placeholder="Để trống = dùng nội dung chung của quản trị"></textarea>
+        <p class="small muted" style="margin:6px 0">Chạm để chèn:
+          <span class="chips" id="varChips">
+            <button type="button" data-v="{ten}">Tên KH</button><button type="button" data-v="{sotb}">Số TB</button>
+            <button type="button" data-v="{sdt}">SĐT</button><button type="button" data-v="{sotien}">Tổng cước</button>
+            <button type="button" data-v="{diaban}">Địa bàn</button><button type="button" data-v="{ky}">Kỳ</button><button type="button" data-v="{han}">Hạn</button>
+          </span></p>
+        <h3>2. Nhóm hỗ trợ (Tammi)</h3>
+        <div class="field"><label for="stUrl">Link nhóm</label><input id="stUrl" type="url" inputmode="url" placeholder="https://zalo.me/g/..." autocapitalize="off"></div>
+        <div class="field"><label for="stName">Tên nhóm</label><input id="stName" placeholder="nhóm Tammi"></div>
+        <p class="small muted" style="margin-top:0">Khi có link, cuối mỗi thông báo tự thêm: <i id="stLine"></i> và nút mở nhóm.</p>
+        <div class="small muted" style="margin-bottom:4px">Khách sẽ thấy:</div>
+        <div id="stPrev" class="msg-body preview"></div>
+        <div class="alert error hidden" id="stErr"></div>
+        <button class="btn-primary w100" id="stSave">Lưu nội dung & link nhóm</button>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <h3 style="margin-top:0">3. Lịch hiển thị thông báo</h3>
+        <div class="grid2">
+          <div class="field"><label for="scFrom">Từ ngày</label><span id="scFromBox"></span></div>
+          <div class="field"><label for="scTimes">Số lần (số ngày)</label><input id="scTimes" type="number" min="1" max="30" value="3"></div>
+          <div class="field"><label for="scGap">Cách nhau (ngày)</label><input id="scGap" type="number" min="1" max="15" value="1"></div>
+        </div>
+        <label>Giờ hiển thị trong ngày (chọn 1 hoặc nhiều)</label>
+        <div class="chips big" id="hourChips">
+          <button type="button" data-h="07:00">07:00</button><button type="button" data-h="08:00" class="on">08:00</button>
+          <button type="button" data-h="11:30">11:30</button><button type="button" data-h="17:00">17:00</button>
+          <button type="button" data-h="19:30">19:30</button><button type="button" data-h="20:30">20:30</button>
+        </div>
+        <div class="grid2" style="margin-top:8px"><div class="field"><label for="scCustom">Giờ khác</label><input id="scCustom" type="time"></div>
+          <div class="field" style="align-self:end"><button type="button" id="scAddHour" class="w100">+ Thêm giờ</button></div></div>
+        <div class="small muted" id="scSum"></div>
+        <div class="alert error hidden" id="scErr"></div>
+        <button class="btn-primary w100" id="scAdd" style="margin-top:8px">Đặt lịch</button>
+        <p class="small muted">Chỉ khách <b>chưa thanh toán</b> và đã <b>bật thông báo</b> mới nhận. Khách đã thu sẽ không bị nhắc.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <h3 style="margin:0">Lịch đã đặt</h3><span class="small muted" id="scDev"></span></div>
+        <div id="scList" style="margin-top:8px"></div>
+        <button id="scNow" class="w100" style="margin-top:10px">📣 Gửi thông báo ngay cho khách chưa thanh toán</button>
+      </div>
+    </main>
+  </section>
+
+  <dialog id="dlg"><form method="dialog" id="dlgForm"></form></dialog>
+
+  <!-- Khung nhắc cước hiện ngay trên màn hình khách -->
+  <dialog id="popup" class="popup" aria-labelledby="popTitle">
+    <button type="button" class="pop-x" id="popX" aria-label="Đóng">✕</button>
+    <div class="pop-ic">🔔</div>
+    <h2 id="popTitle"></h2>
+    <p id="popBody"></p>
+    <div class="pop-acts">
+      <button type="button" id="popPush" class="btn-primary w100 hidden">🔔 Bật thông báo nhắc cước</button>
+      <a id="popSupport" class="btn w100 hidden" target="_blank" rel="noopener">💬 <span></span></a>
+      <button type="button" id="popClose" class="w100">Đã hiểu</button>
+    </div>
+  </dialog>
+  <script src="/shared/datefield.js"></script>
+  <script>document.getElementById('scFromBox').outerHTML = DateField.html({ id: 'scFrom' });</script>
+  <script src="app.js"></script>
+</body>
+</html>
