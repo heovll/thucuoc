@@ -1,0 +1,6 @@
+node_modules/
+# Dữ liệu khách hàng, mật khẩu, khoá thông báo – KHÔNG đưa lên GitHub
+data/
+*.db
+*.db-*
+.env

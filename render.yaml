@@ -1,0 +1,28 @@
+# Cấu hình chạy trên Render (https://render.com) – Render đọc file này khi tạo "Blueprint" từ repo GitHub.
+# Cần gói có ổ đĩa lưu bền (disk) để giữ CSDL trong thư mục /var/data qua các lần khởi động lại.
+services:
+  - type: web
+    name: nhac-thu-cuoc
+    runtime: node
+    plan: starter
+    region: singapore
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /app/
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: DATA_DIR
+        value: /var/data
+      - key: TRUST_PROXY
+        value: "1"
+      # Mật khẩu tài khoản admin lần đầu – Render sẽ hỏi bạn nhập khi tạo
+      - key: ADMIN_PASSWORD
+        sync: false
+      # Email liên hệ cho dịch vụ thông báo đẩy, dạng mailto:ten@gmail.com – Render sẽ hỏi bạn nhập
+      - key: VAPID_SUBJECT
+        sync: false
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
